@@ -1,0 +1,21 @@
+[project]
+name = "stamp-extractor-backend"
+version = "0.1.0"
+description = "印章提取 Web 应用后端"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "python-multipart>=0.0.18",
+    "rembg[cpu]>=2.0",
+    "onnxruntime>=1.20",
+    "opencv-python-headless>=4.10",
+    "Pillow>=11.0",
+    "python-magic>=0.4",
+]
+
+[project.optional-dependencies]
+enhance = [
+    "realesrgan>=0.3",
+    "torch>=2.5",
+]
