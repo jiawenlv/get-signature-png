@@ -110,7 +110,7 @@ export default function SettingsPanel({ options, onChange }: SettingsPanelProps)
               }}
               className="w-28 px-2 py-1.5 text-sm text-gray-700 border border-gray-300 rounded-md font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             />
-            {"EyeDropper" in window && (
+            {"EyeDropper" in window ? (
               <button
                 type="button"
                 onClick={async () => {
@@ -134,6 +134,25 @@ export default function SettingsPanel({ options, onChange }: SettingsPanelProps)
                 </svg>
                 取色
               </button>
+            ) : (
+              <label
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
+                title="选择颜色"
+              >
+                <input
+                  type="color"
+                  value={options.customColor || "#e04040"}
+                  onChange={(e) => onChange({ ...options, customColor: e.target.value })}
+                  className="w-0 h-0 opacity-0 absolute"
+                />
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 22l1-1h3l9-9" />
+                  <path d="M3 21v-3l9-9" />
+                  <path d="M14.5 5.5l4 4" />
+                  <path d="M18.5 1.5a2.121 2.121 0 013 3l-1 1-4-4 1-1z" />
+                </svg>
+                取色
+              </label>
             )}
           </div>
         ) : (
