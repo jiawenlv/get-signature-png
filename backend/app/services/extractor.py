@@ -255,7 +255,7 @@ def extract_stamp(
             _recolor_stamp(output_path, color, brightness_threshold, custom_color)
         else:
             # --- 模式一：颜色精炼 + 饱和度过滤 ---
-            refine_by_color(source_for_pixels, output_path, color, output_path)
+            refine_by_color(source_for_pixels, output_path, color, output_path, saturation_threshold)
 
         # --- 裁剪 ---
         _auto_crop_and_clean_alpha(output_path)

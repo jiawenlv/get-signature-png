@@ -121,6 +121,7 @@ def refine_by_color(
     ai_result_path: Path,
     color: str,
     output_path: Path,
+    saturation_threshold: int = 40,
 ) -> Path:
     """AI 提取后颜色精炼：用 AI 的 alpha 约束区域，在原图上做 HSV 颜色过滤只保留墨水像素。
 
@@ -150,14 +151,16 @@ def refine_by_color(
 
     hsv = cv2.cvtColor(original, cv2.COLOR_BGR2HSV)
 
-    # 3. 用宽松阈值生成颜色掩码
+    # 3. 用宽松阈值生成颜色掩码，饱和度下限受 saturation_threshold 控制
     if color not in HSV_RANGES_RELAXED:
         return output_path
 
     color_config = HSV_RANGES_RELAXED[color]
     color_mask = None
     for r in color_config["ranges"]:
-        partial = cv2.inRange(hsv, r["lower"], r["upper"])
+        lower = r["lower"].copy()
+        lower[1] = min(lower[1], saturation_threshold)
+        partial = cv2.inRange(hsv, lower, r["upper"])
         if color_mask is None:
             color_mask = partial
         else:

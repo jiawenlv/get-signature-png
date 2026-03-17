@@ -12,6 +12,10 @@ export interface ExtractOptions {
   customColor: string; // 模式二自定义颜色 hex，如 "#e04040"
 }
 
+export interface EnhanceOptions {
+  denoiseStrength: number;
+}
+
 export interface TaskResponse {
   task_id: string;
   status: TaskStatus;

@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.routers import stamp
+from app.routers import enhance, stamp
 from app.services.task_manager import start_cleanup_loop
 
 
@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
     cleanup_task.cancel()
 
 
-app = FastAPI(title="印章提取工具", lifespan=lifespan)
+app = FastAPI(title="小吕的图像工作室", lifespan=lifespan)
 
 # CORS 中间件
 app.add_middleware(
@@ -31,6 +31,7 @@ app.add_middleware(
 
 # 注册路由
 app.include_router(stamp.router)
+app.include_router(enhance.router)
 
 @app.get("/api/health")
 async def health_check():

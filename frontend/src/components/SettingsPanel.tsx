@@ -1,8 +1,11 @@
+import { useRef } from "react";
 import type { ExtractOptions, StampColor, StampMode } from "../types";
 
 interface SettingsPanelProps {
   options: ExtractOptions;
   onChange: (options: ExtractOptions) => void;
+  onPickColor?: () => void;
+  isPickingColor?: boolean;
 }
 
 const COLORS: { value: StampColor; label: string; dot: string }[] = [
@@ -63,7 +66,8 @@ function ThresholdControl({
   );
 }
 
-export default function SettingsPanel({ options, onChange }: SettingsPanelProps) {
+export default function SettingsPanel({ options, onChange, onPickColor, isPickingColor }: SettingsPanelProps) {
+  const colorInputRef = useRef<HTMLInputElement>(null);
   return (
     <div className="flex flex-col gap-4">
       {/* 处理模式 */}
@@ -92,8 +96,17 @@ export default function SettingsPanel({ options, onChange }: SettingsPanelProps)
         {options.mode === "recolor" ? (
           <div className="flex items-center gap-2">
             <span
-              className="w-8 h-8 rounded-md border border-gray-300 shrink-0"
+              className="w-8 h-8 rounded-md border border-gray-300 shrink-0 cursor-pointer hover:ring-2 hover:ring-blue-400 transition-shadow"
               style={{ backgroundColor: options.customColor || "#e04040" }}
+              title="点击选择颜色"
+              onClick={() => colorInputRef.current?.click()}
+            />
+            <input
+              ref={colorInputRef}
+              type="color"
+              value={options.customColor || "#e04040"}
+              onChange={(e) => onChange({ ...options, customColor: e.target.value })}
+              className="w-0 h-0 opacity-0 absolute"
             />
             <input
               type="text"
@@ -110,21 +123,16 @@ export default function SettingsPanel({ options, onChange }: SettingsPanelProps)
               }}
               className="w-28 px-2 py-1.5 text-sm text-gray-700 border border-gray-300 rounded-md font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             />
-            {"EyeDropper" in window ? (
+            {onPickColor && (
               <button
                 type="button"
-                onClick={async () => {
-                  try {
-                    // @ts-expect-error EyeDropper API
-                    const dropper = new EyeDropper();
-                    const result = await dropper.open();
-                    onChange({ ...options, customColor: result.sRGBHex });
-                  } catch {
-                    // user cancelled
-                  }
-                }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                title="从屏幕取色"
+                onClick={onPickColor}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                  isPickingColor
+                    ? "text-white bg-blue-600 border border-blue-600"
+                    : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
+                }`}
+                title="从原图取色"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M2 22l1-1h3l9-9" />
@@ -132,27 +140,8 @@ export default function SettingsPanel({ options, onChange }: SettingsPanelProps)
                   <path d="M14.5 5.5l4 4" />
                   <path d="M18.5 1.5a2.121 2.121 0 013 3l-1 1-4-4 1-1z" />
                 </svg>
-                取色
+                {isPickingColor ? "取色中..." : "取色"}
               </button>
-            ) : (
-              <label
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
-                title="选择颜色"
-              >
-                <input
-                  type="color"
-                  value={options.customColor || "#e04040"}
-                  onChange={(e) => onChange({ ...options, customColor: e.target.value })}
-                  className="w-0 h-0 opacity-0 absolute"
-                />
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M2 22l1-1h3l9-9" />
-                  <path d="M3 21v-3l9-9" />
-                  <path d="M14.5 5.5l4 4" />
-                  <path d="M18.5 1.5a2.121 2.121 0 013 3l-1 1-4-4 1-1z" />
-                </svg>
-                取色
-              </label>
             )}
           </div>
         ) : (
@@ -180,7 +169,7 @@ export default function SettingsPanel({ options, onChange }: SettingsPanelProps)
         <ThresholdControl
           label="饱和度阈值"
           value={options.saturationThreshold}
-          min={30}
+          min={0}
           max={150}
           lowLabel="保留更多"
           highLabel="过滤更多"
@@ -190,7 +179,7 @@ export default function SettingsPanel({ options, onChange }: SettingsPanelProps)
         <ThresholdControl
           label="灰度阈值"
           value={options.brightnessThreshold}
-          min={80}
+          min={10}
           max={220}
           lowLabel="只留深墨"
           highLabel="保留浅墨"
