@@ -23,9 +23,35 @@ macOS 需要 `brew install libmagic`（python-magic 依赖）。
 ```bash
 cd frontend
 npm install
-npm run dev      # 开发服务器 http://localhost:5173，自动代理 /api 到后端 :8090
+npm run dev      # 开发服务器，自动代理 /api 到后端 :8090
 npm run build    # 生产构建
 npm run lint     # ESLint 检查
+```
+
+### HTTPS 开发模式
+
+Vite 已配置自动检测 `frontend/` 目录下的 mkcert 证书，检测到时自动启用 HTTPS（局域网访问、EyeDropper / showSaveFilePicker 等安全上下文 API 需要 HTTPS）。
+
+**生成本地证书（仅首次）：**
+
+```bash
+brew install mkcert
+mkcert -install
+cd frontend
+mkcert localhost 127.0.0.1 ::1 <你的局域网IP>   # 生成 localhost+N.pem / localhost+N-key.pem
+```
+
+**启动前后端：**
+
+```bash
+# 终端 1 — 后端
+cd backend
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8090 --reload
+
+# 终端 2 — 前端（检测到证书后自动 HTTPS）
+cd frontend
+npm run dev
+# → https://localhost:5173/
 ```
 
 ### Health Check
