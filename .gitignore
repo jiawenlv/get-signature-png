@@ -49,3 +49,11 @@ dist/
 # Project specific
 uploads/
 outputs/
+backend/weights/
+
+# 本地 HTTPS 证书（mkcert 生成，含私钥，按机器/IP 生成不入库）
+*.pem
+
+# 临时测试产物
+stamp_*.png
+test-pic.*
